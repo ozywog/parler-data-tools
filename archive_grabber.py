@@ -1,5 +1,6 @@
 import internetarchive as ia
 from hurry.filesize import size
+import concurrent.futures
 import logging
 import threading
 import time
@@ -8,61 +9,59 @@ import time
 dl_maxsize_final = 5368709120
 
 # downloader thread limit, CHANGE THIS
-dl_threadlimit = 5
+dl_threadlimit = 20
+
+# change the collection name
+collection_name = "officialukplaystationmagazine"  #example
 
 # don't change this
 dl_currentsize_final = 0
-
-
-def thread_function(name):
-    logging.info("Thread %s: starting", name)
-    time.sleep(2)
-    logging.info("Thread %s: finishing", name)
-
 
 def init_download():
     logformat = "%(asctime)s: %(message)s"
     logging.basicConfig(format=logformat, level=logging.INFO,
                         datefmt="%H:%M:%S")
     logging.info("Main    : Archive download initiated")
-    download_collection(dl_currentsize_final, dl_maxsize_final, dl_threadlimit)
+    start_time = time.time()
+    coll_items = index_collection(dl_currentsize_final, dl_maxsize_final)
+    download_all_files(coll_items, dl_threadlimit)
+    duration = time.time() - start_time
+    print(f"Downloaded {len(coll_items)} in {duration} seconds")
 
 
-def download_collection(dl_currentsize, dl_maxsize, threadlimit):
-
+def index_collection(dl_currentsize, dl_maxsize):
     num = 0
-    threadcount = 0
+    coll_itemlist = ia.search_items('collection:'+collection_name)
+    itemlist = []
 
-    while dl_currentsize < dl_maxsize:
-        threads = []
-        while threadcount < threadlimit:
-            for result in ia.search_items('collection:archiveteam_neparlepas'):
-                num = num + 1  # item count
-                itemid = result['identifier']
-                logging.info("Main    : initiate dl thread for result #" + str(num) + ": " + str(itemid))
+    for result in coll_itemlist:
+        num = num + 1  # item count
+        itemid = result['identifier']
+        logging.info("Main    : Added result #" + str(num) + ": " + str(itemid))
 
-                item = ia.get_item(itemid)
-                item_size = item.item_size
-                print('Local archive size:' + str(size(dl_currentsize)) + '/' +str(size(dl_maxsize)))
-                print('Current item size:' + str(size(item_size)))
+        item = ia.get_item(itemid)
+        item_size = item.item_size
+        print('Current item size:' + str(size(item_size)))
 
-                dl_currentsize += item_size
-                x = threading.Thread(target=threaded_downloader(item), args=(str(itemid)))
-                logging.info("Main    : Executing download thread")
-                x.start()
-                threads.append(x)
-                threadcount += 1
+        if (dl_currentsize + item_size) < dl_maxsize:
+            dl_currentsize += item_size
+            itemlist.append(item)
+        else:
+            break
 
-        logging.info("Main    : Thread limit reached, waiting for completion.")
-        for t in threads:
-            t.join()
-        logging.info("Main    : All current threads complete. Continuing.")
-        threadcount = 0
-
-    print('Download Limit reached, quitting.')
+    print("Completed collection indexing to size limit.")
+    return itemlist
 
 
-def threaded_downloader(item):
+def downloader(item):
+    print('Started thread for item')
     item.download()
+
+
+def download_all_files(items, threadlimit):
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=threadlimit) as executor:
+        executor.map(downloader, items)
+
 
 init_download()
