@@ -7,4 +7,4 @@ hurry.filesize
 internetarchive
 
 To install:
-pip install hurry.filesize internetarchiive
+pip install hurry.filesize internetarchive
