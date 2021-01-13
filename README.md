@@ -1,6 +1,6 @@
 # Parler-Data-Tools
 
-This is a collection of python scripts and methods to parse/process/analyze bulk WARC file data from the Parler web scrap archive
+This is a collection of python scripts and methods to parse/process/analyze bulk WARC file data from the Parler web scrape archive
 
 ## Dependencies
 
