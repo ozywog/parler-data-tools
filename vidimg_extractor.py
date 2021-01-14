@@ -42,7 +42,7 @@ def extract():
 
     def get_extension(line):
         extension = 'unknown.bin'
-        if b'jpeg' in line:
+        if b'jpeg' or b'jpg' in line:
             extension = 'jpg'
         elif b'png' in line:
             extension = 'png'
