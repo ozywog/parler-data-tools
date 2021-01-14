@@ -60,7 +60,7 @@ def download_all_files(items, threadlimit):
 def main():
 
     collection_name = sys.argv[1]
-    dl_limit = int(sys.argv[2])*(2^30)
+    dl_limit = int(sys.argv[2])*(1024*1024*1024)
     thread_limit = int(sys.argv[3])
 
 

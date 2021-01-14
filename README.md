@@ -23,7 +23,9 @@ We are working very fast to get this stuff into a usable state for the public, b
 vidimg_extractor.py - Use this script to extract all video and image files from a given Parler WARC archive and store them for local access. Files are saved with the filename as the corresponding base64 encoded URIs. This allows us to connect them back to their occurances in the archive.
 
 archive_grabber.py - This script can be used by passing it a collection name from archive.org. The script attempts to recursively download all files in the collection. Multithreaded, default 10 threads. 
-
+```
+Python3 archive_grabber.py <collection_name> <size_limit_in_GB> <concurrent_thread_limit>
+```
 **Code Snippets**
 
 warc_parser.py - a collections of python methods that can be used to extract and relate different types of information from the Parler archives.
