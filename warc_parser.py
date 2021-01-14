@@ -5,8 +5,13 @@ import base64
 import os
 from bs4 import BeautifulSoup
 
+# ATTENTION! There is no main method here, this is just code snippets. don't try and run it standalone, it wont work.
+
 warc = warcat.model.WARC()
 
+# add warc filepath here
+warcpath = ""
+records = warc.open(warcpath)
 
 def delete_duplicate_lines_in_file(filename):
     inputfile = open(filename, "r")
@@ -144,14 +149,3 @@ def extract_file_at_link(link):
                         img.close()
                         print(filename)
                         break
-
-
-
-
-warcpath = "parler_20210110180312_ab60bbf5.megawarc.warc"
-records = warc.open(warcpath)
-user = ""
-
-verify_output_dirs()
-photo_uri = return_profile_photo_link(user, records)
-extract_file_at_link(photo_uri)
